@@ -1,3 +1,3 @@
 require "rbref"
 
-run Sinatra::Application
+run Sinatra::Applicatiok

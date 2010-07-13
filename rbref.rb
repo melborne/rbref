@@ -1,6 +1,5 @@
 require "rubygems"
 require "sinatra"
-require "erb"
 
 configure do
   VERSIONS = Dir['views/1*'].map { |path| File.basename(path, '.*') }.sort
