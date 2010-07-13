@@ -1,2 +1,2 @@
-require 'rbref.rb'
+require 'rbref'
 run Sinatra::Application
