@@ -1,0 +1,21 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Ruby Reference Index</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+  </head>
+  <body>
+    <div id='header'>
+      <% VERSIONS.each do |version| %>
+        <div class='version'>
+          <a class='version_link' href= "/<%= version %>"><%= version %></a>
+        </div>
+      <% end %>
+    </div>
+    <div id='main'>
+      <%= yield %> 
+    </div>
+  </body>
+</html>
