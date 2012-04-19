@@ -40,7 +40,7 @@ def method_list(klass)
   methods = klass.methods_by_type
   methods.keys.each do |key|
     unless klass == Module && key == 'private_instance_methods'
-      methods[key].reject!{ |m| m =~ /#{@@methods_here.join('|')}/}
+      methods[key].reject!{ |m| @@methods_here.include? m }
     end
   end
   return methods.reject{ |k,v| v.empty? }
@@ -77,9 +77,18 @@ def enum_class_check(klass)
   else
     klass
   end
+  klass
 end
 
-ENCODE_TBL = { "*" => "=2a", "+" => "=2b", "\\-" => "=2d", "/" => "=2f", "<" => "=3c", "=" => "=3d", ">" => "=3e", "?" => "=3f", "\\[" => "=5b", "\\]" => "=5d", "\\^" => "=5e", "~" => "=7e", "|" => "=7c", "@" => "=40", "!" => "=21",  "%" => "=25", "&" => "=26" }
+ENCODE_TBL = { "*" => "=2a", "+" => "=2b", "\\-" => "=2d", "." => "=2e", "/" => "=2f", ":" => "=3a", "<" => "=3c", "=" => "=3d", ">" => "=3e", "?" => "=3f", "\\[" => "=5b", "\\]" => "=5d", "\\^" => "=5e", "~" => "=7e", "|" => "=7c", "@" => "=40", "!" => "=21",  "%" => "=25", "&" => "=26"}
+
+def h(url)
+  url = url.to_s.sub(/\.class$/, '') # handle errgular link for ARGF.class
+  url.gsub(/["#{ENCODE_TBL.keys.join}"]/) do |s|
+    s.sub!(/[\[\]\^\-]/) { |i| "\\#{i}" }
+    ENCODE_TBL[s]
+  end
+end
 
 def ruby_man_method_link(klass, meth_type, meth)
   case
@@ -105,20 +114,23 @@ def ruby_man_method_link(klass, meth_type, meth)
   when meth_type =~ /private/
     klass = Object unless klass == Module
     mtype = "i"
+  when klass == ARGF.class
+    klass = ARGF
+    mtype = "s"
   else # public_instance_methods
     mtype = "i"
   end
-  meth = meth.to_s.gsub(/["#{ENCODE_TBL.keys.join}"]/) do |s|
-    s.sub!(/[\[\]\^\-]/) { |i| "\\#{i}" }
-    ENCODE_TBL[s]
-  end
-  RUBY_REF + "method/#{enum_class_check(klass)}" + "/#{mtype}/#{meth}.html"
+  #meth = meth.to_s.gsub(/["#{ENCODE_TBL.keys.join}"]/) do |s|
+    #s.sub!(/[\[\]\^\-]/) { |i| "\\#{i}" }
+    #ENCODE_TBL[s]
+  #end
+  RUBY_REF + "method/#{klass}" + "/#{mtype}/#{h meth}.html"
 end
 
 REQUIRED_CLASSES = [ERB, RbUtils]
-DEFINED_HERE = ['RUBY_REF','RUBY186_METHODS','RUBY_DESC','USEFUL_LINKS']
+DEFINED_HERE = [:RUBY_REF, :RUBY186_METHODS, :RUBY_DESC, :USEFUL_LINKS, :ENCODE_TBL, :RUBY186, :DEFINED_HERE, :REQUIRED_CLASSES ]
 def get_classes
-  klasses = RbUtils.classes.sort_by{|k| k.to_s } - REQUIRED_CLASSES
+  klasses = RbUtils.classes.sort_by{|k| k.to_s }.reject { |k| REQUIRED_CLASSES.any? { |ex| k.to_s.match /^#{ex}/ } }
   if RUBY_VERSION >= "1.9.0"
     klasses -= [Complex, RubyVM]
     sclass = BasicObject
@@ -142,7 +154,7 @@ def get_constants
 end
 
 def get_libraries
-  RbUtils.standard_library.map { |lib| [lib, lib.gsub(/\//, ENCODE_TBL["/"])] }
+  RbUtils.standard_library
 end
 
 def get_ruby186_methods
@@ -194,8 +206,8 @@ __END__
  </div>
  <div class='top_list'>
    <h3 class='top_subtitle'>Standard Library</h3>	    
-   <% libraries.each do |name, path| %>
-   <span><a class="top_class_link" href="<%= RUBY_REF %>library/<%= path %>.html"><%= name %></a> | </span>
+   <% libraries.each do |lib| %>
+   <span><a class="top_class_link" href="<%= RUBY_REF %>library/<%= h(lib) %>.html"><%= lib %></a> | </span>
    <% end %>
    <span class="counter"><%= libraries.length %></span>
  </div>
@@ -216,7 +228,7 @@ __END__
      <a href="">top</a>
    </span>
    <div class='class_title_bar' id="<%= klass %>">
-     <a class="class_link" id='class_name' href="<%= RUBY_REF %>class/<%= enum_class_check(klass) %>.html"><%= klass %></a><span id='class_suffix'> <%= klass.class %></span>
+     <a class="class_link" id='class_name' href="<%= RUBY_REF %>class/<%= h klass %>.html"><%= klass %></a><span id='class_suffix'> <%= klass.class %></span>
      <span class="superclass">
        <% unless super_classes.empty? %>
          <% super_classes.each do |sc| %>
@@ -249,7 +261,7 @@ __END__
      <% if klass == Kernel %>
  		  <h3 class='meth_type'>Constants</h3>
  		  <% constants.each do |const| %>
-   			<span><a class='meth_link' href="<%= RUBY_REF %>method/Kernel/c/<%= const %>"><%= const %></a> | </span>
+   			<span><a class='meth_link' href="<%= RUBY_REF %>method/Kernel/c/<%= const %>.html"><%= const %></a> | </span>
    		<% end %>
  		<% end %>
    </div>
