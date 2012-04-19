@@ -40,7 +40,6 @@ module RbUtils
 
   def self.ruby186_methods
     begin
-      return [] if RUBY_VERSION == '1.8.6'
       return [] unless system("#{RUBY186} -v")
 
       meths = %x(#{RUBY186} -rrbutils -e "#{<<CODE}")
