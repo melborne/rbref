@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 # generate Ruby Reference Index
 # usage: ruby186 rbref_gen.rb
 
@@ -5,21 +6,22 @@ $:.unshift(File.dirname(__FILE__))
 require "rbutils"
 require "erb"
 
-RUBY_REF = "http://doc.okkez.net/#{RUBY_VERSION.delete('.')}/view/"
+#RUBY_REF = "http://doc.okkez.net/#{RUBY_VERSION.delete('.')}/view/"
+RUBY_REF = "http://doc.ruby-lang.org/ja/#{RUBY_VERSION}/"
 USEFUL_LINKS = 
   { "Standard Library" => "#{RUBY_REF}library",
-    "Regular Expression" => "#{RUBY_REF}spec/regexp",
-    "sprintf format" => "#{RUBY_REF}print_format",
-    "strftime format" => "#{RUBY_REF}method/Time/i/strftime",
-    "Kernel module" => "#{RUBY_REF}class/Kernel",
-    "M17N" => "#{RUBY_REF}spec/m17n",
-    "Ruby Official" => "http://www.ruby-lang.org/ja/",
+    "Regular Expression" => "#{RUBY_REF}doc/spec=2fregexp.html",
+    "sprintf format" => "#{RUBY_REF}doc/print_format.html",
+    "strftime format" => "#{RUBY_REF}method/Time/i/strftime.html",
+    "Kernel module" => "#{RUBY_REF}class/Kernel.html",
+    "M17N" => "#{RUBY_REF}doc/spec=2fm17n.html",
     "RubyGems" => "http://rubygems.org/",
-    "RAA" => "http://raa.ruby-lang.org/",
+    "The Ruby Toolbox" => "https://www.ruby-toolbox.com/",
+    "Gem Docs" => "http://rubydoc.info/gems",
+    "Ruby Official" => "http://www.ruby-lang.org/ja/",
     "Rubyist Magazine" => "http://jp.rubyist.net/magazine/",
     "Ruby-list" => "http://blade.nagaokaut.ac.jp/ruby/ruby-list/index.shtml",
     "Ruby-talk" => "http://blade.nagaokaut.ac.jp/ruby/ruby-talk/index.shtml",
-    "old Ruby Ref" => "http://www.ruby-lang.org/ja/man/html/",
     "RHG" => "http://i.loveruby.net/ja/rhg/book/"
    }
 RUBY_DESC = 
@@ -109,7 +111,7 @@ def ruby_man_method_link(klass, meth_type, meth)
     s.sub!(/[\[\]\^\-]/) { |i| "\\#{i}" }
     end_symbol[s]
   end
-  RUBY_REF + "method/#{enum_class_check(klass)}" + "/#{mtype}/#{meth}"
+  RUBY_REF + "method/#{enum_class_check(klass)}" + "/#{mtype}/#{meth}.html"
 end
 
 REQUIRED_CLASSES = [ERB, RbUtils]
@@ -139,7 +141,7 @@ def get_constants
 end
 
 def get_libraries
-  RbUtils.standard_library
+  RbUtils.standard_library.map { |lib| [lib, lib.gsub(/\//, '=2f')] }
 end
 
 def get_ruby186_methods
@@ -165,7 +167,7 @@ generate()
 __END__
  <div id='top'>
    <h2 id="ruby_title">
-     <a id="top_title_link" href="<%= RUBY_REF %>index"> <%= RUBY_DESC.capitalize %></a>
+     <a id="top_title_link" href="<%= RUBY_REF %>doc/index.html"> <%= RUBY_DESC.capitalize %></a>
    </h2>
  </div>
  <div class='top_list'>
@@ -191,8 +193,8 @@ __END__
  </div>
  <div class='top_list'>
    <h3 class='top_subtitle'>Standard Library</h3>	    
-   <% libraries.each do |lib| %>
-   <span><a class="top_class_link" href="<%= RUBY_REF %>library/<%= lib %>"><%= lib %></a> | </span>
+   <% libraries.each do |name, path| %>
+   <span><a class="top_class_link" href="<%= RUBY_REF %>library/<%= path %>.html"><%= name %></a> | </span>
    <% end %>
    <span class="counter"><%= libraries.length %></span>
  </div>

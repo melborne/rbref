@@ -1,7 +1,7 @@
 # = RbUtils -- Ruby Utility to get classes, methods, class hierarchy, libraries
 #
 # rbutils.rb -
-# Author:: keyes
+# Author:: kyoendo
 
 #require "find"
 module RbUtils
@@ -25,19 +25,25 @@ module RbUtils
     lib187 = lib186 - ['securerandom'] + ['enumerator']
     lib191 = lib187 - %w(Env cgi-lib complex date2 eregex finalize ftools generator getopts importenv jcode mailread md5 net/ftptls net/telnets parsearg parsedate ping rational readbytes rubyunit sha1 soap wsdl xsd) + %w(cmath continuation coverage fiber json minitest/mock minitest/spec minitest/unit prime rake ripper rubygems ubygems)
     lib192 = lib191 + ['objspace']
+    lib193 = lib192 + ['io/console']
 
     case RUBY_VERSION
     when '1.8.6' then lib186
     when '1.8.7' then lib187
     when '1.9.1' then lib191
-    else lib192
+    when '1.9.2' then lib192
+    when '1.9.3' then lib193
     end.sort
   end
   
+  RUBY186 = "~/.rbenv/versions/1.8.6-p420/bin/ruby"
+
   def self.ruby186_methods
     begin
-      # set your ruby 1.8.6 path for execution
-      meths = %x(ruby186 -rrbutils -e "#{<<CODE}")
+      return [] if RUBY_VERSION == '1.8.6'
+      return [] unless system("#{RUBY186} -v")
+
+      meths = %x(#{RUBY186} -rrbutils -e "#{<<CODE}")
         meths = {}
         klass_and_module = RbUtils.classes + RbUtils.modules - [RbUtils]
         klass_and_module.each do |klass|
@@ -45,7 +51,7 @@ module RbUtils
         end
         p meths
 CODE
-        eval(meths)
+      eval(meths)
     rescue Exception => e
     end
   end
