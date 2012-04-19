@@ -216,7 +216,7 @@ __END__
      <a href="">top</a>
    </span>
    <div class='class_title_bar' id="<%= klass %>">
-     <a class="class_link" id='class_name' href="<%= RUBY_REF %>class/<%= enum_class_check(klass) %>"><%= klass %>.html</a><span id='class_suffix'> <%= klass.class %></span>
+     <a class="class_link" id='class_name' href="<%= RUBY_REF %>class/<%= enum_class_check(klass) %>.html"><%= klass %></a><span id='class_suffix'> <%= klass.class %></span>
      <span class="superclass">
        <% unless super_classes.empty? %>
          <% super_classes.each do |sc| %>
