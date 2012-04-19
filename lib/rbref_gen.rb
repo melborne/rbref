@@ -79,8 +79,9 @@ def enum_class_check(klass)
   end
 end
 
+ENCODE_TBL = { "*" => "=2a", "+" => "=2b", "\\-" => "=2d", "/" => "=2f", "<" => "=3c", "=" => "=3d", ">" => "=3e", "?" => "=3f", "\\[" => "=5b", "\\]" => "=5d", "\\^" => "=5e", "~" => "=7e", "|" => "=7c", "@" => "=40", "!" => "=21",  "%" => "=25", "&" => "=26" }
+
 def ruby_man_method_link(klass, meth_type, meth)
-  end_symbol = { "*" => "=2a", "+" => "=2b", "\\-" => "=2d", "/" => "=2f", "<" => "=3c", "=" => "=3d", ">" => "=3e", "?" => "=3f", "\\[" => "=5b", "\\]" => "=5d", "\\^" => "=5e", "~" => "=7e", "|" => "=7c", "@" => "=40", "!" => "=21",  "%" => "=25", "&" => "=26" }
   case
   when klass == Kernel && meth_type == "public_instance_methods"
     klass = Object
@@ -107,9 +108,9 @@ def ruby_man_method_link(klass, meth_type, meth)
   else # public_instance_methods
     mtype = "i"
   end
-  meth = meth.to_s.gsub(/["#{end_symbol.keys.join}"]/) do |s|
+  meth = meth.to_s.gsub(/["#{ENCODE_TBL.keys.join}"]/) do |s|
     s.sub!(/[\[\]\^\-]/) { |i| "\\#{i}" }
-    end_symbol[s]
+    ENCODE_TBL[s]
   end
   RUBY_REF + "method/#{enum_class_check(klass)}" + "/#{mtype}/#{meth}.html"
 end
@@ -141,7 +142,7 @@ def get_constants
 end
 
 def get_libraries
-  RbUtils.standard_library.map { |lib| [lib, lib.gsub(/\//, '=2f')] }
+  RbUtils.standard_library.map { |lib| [lib, lib.gsub(/\//, ENCODE_TBL["/"])] }
 end
 
 def get_ruby186_methods
@@ -215,7 +216,7 @@ __END__
      <a href="">top</a>
    </span>
    <div class='class_title_bar' id="<%= klass %>">
-     <a class="class_link" id='class_name' href="<%= RUBY_REF %>class/<%= enum_class_check(klass) %>"><%= klass %></a><span id='class_suffix'> <%= klass.class %></span>
+     <a class="class_link" id='class_name' href="<%= RUBY_REF %>class/<%= enum_class_check(klass) %>"><%= klass %>.html</a><span id='class_suffix'> <%= klass.class %></span>
      <span class="superclass">
        <% unless super_classes.empty? %>
          <% super_classes.each do |sc| %>
