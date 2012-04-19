@@ -6,23 +6,26 @@
 #require "find"
 module RbUtils
   def self.classes
-    klasses = constants_plus.map{ |const| eval(const.to_s) }.select{ |k| k.class == Class }
-    klasses << Enumerable::Enumerator if RUBY_VERSION == '1.8.7'
-    klasses
+    objects(Class)
   end
   
   def self.modules
-    constants_plus.map{ |const| eval(const.to_s) }.select{ |m| m.class == Module }
+    objects(Module)
   end
+
+  def self.objects(target)
+    ObjectSpace.each_object(Module).select { |obj| obj.class == target }
+  end
+  private :objects
   
   def self.constants
-    Module.constants.map{ |c| c.to_s }.select{ |c| eval(c).class.to_s !~ /Class|Module/ }
+    Module.constants.reject{ |c| [Class, Module].include? eval("#{c}").class }
   end
   
   # depends on library paths
   def self.standard_library
-    lib186 = %w(abbrev base64 benchmark bigdecimal cgi cgi-lib complex csv curses date date2 dbm debug delegate digest dl drb e2mmap English enumerator Env erb eregex etc expect fcntl fileutils finalize find forwardable ftools gdbm generator getoptlong getopts gserver iconv importenv io/nonblock io/wait ipaddr irb jcode kconv logger mailread mathn matrix md5 mkmf monitor mutex_m net/ftp net/ftptls net/http net/https net/imap net/pop net/protocol net/smtp net/telnet net/telnets nkf observer open3 open-uri openssl optparse ostruct parsearg parsedate pathname ping pp prettyprint profile profiler pstore pty racc/parser rational rbconfig readbytes readline resolv resolv-replace rexml rinda/rinda rinda/tuplespace rss rubyunit scanf sdbm set sha1 shell shellwords singleton soap socket stringio strscan sync syslog tempfile test/unit thread thwait time timeout tk tmpdir tracer tsort un uri weakref webrick win32/registry win32/resolv Win32API win32ole wsdl xmlrpc xsd yaml zlib)
-    lib187 = lib186 - ['securerandom'] + ['enumerator']
+    lib186 = %w(abbrev base64 benchmark bigdecimal cgi cgi-lib complex csv curses date date2 dbm debug delegate digest dl drb e2mmap English Env erb eregex etc expect fcntl fileutils finalize find forwardable ftools gdbm generator getoptlong getopts gserver iconv importenv io/nonblock io/wait ipaddr irb jcode kconv logger mailread mathn matrix md5 mkmf monitor mutex_m net/ftp net/ftptls net/http net/https net/imap net/pop net/protocol net/smtp net/telnet net/telnets nkf observer open3 open-uri openssl optparse ostruct parsearg parsedate pathname ping pp prettyprint profile profiler pstore pty racc/parser rational rbconfig readbytes readline resolv resolv-replace rexml rinda/rinda rinda/tuplespace rss rubyunit scanf sdbm set sha1 shell shellwords singleton soap socket stringio strscan sync syslog tempfile test/unit thread thwait time timeout tk tmpdir tracer tsort un uri weakref webrick win32/registry win32/resolv Win32API win32ole wsdl xmlrpc xsd yaml zlib)
+    lib187 = lib186 - ['securerandom']
     lib191 = lib187 - %w(Env cgi-lib complex date2 eregex finalize ftools generator getopts importenv jcode mailread md5 net/ftptls net/telnets parsearg parsedate ping rational readbytes rubyunit sha1 soap wsdl xsd) + %w(cmath continuation coverage fiber json minitest/mock minitest/spec minitest/unit prime rake ripper rubygems ubygems)
     lib192 = lib191 + ['objspace']
     lib193 = lib192 + ['io/console']
@@ -54,11 +57,6 @@ CODE
     rescue Exception => e
     end
   end
-  
-  private
-  def self.constants_plus
-    Module.constants + [File::Constants, File::Stat, Process::GID, Process::Status, Process::Sys, Process::UID, Struct::Tms]
-  end
 end
 
 class Module
@@ -79,6 +77,7 @@ class Module
     meths
   end
 end
+
 class Array
   def class_tree(parents)
     result = []
@@ -89,3 +88,4 @@ class Array
     result
   end
 end
+
