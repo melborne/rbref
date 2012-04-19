@@ -1,11 +1,12 @@
 * {
+   font-family: Helvetica, sans-serif;
    margin: 0;
    padding: 0;
 }
 #header {
-   background: #922;
-   height: 20px;
-   padding: 2px 50px;
+   background: #222222;
+   height: 25px;
+   padding: 7px 50px 3px;
 }
 .version {
   float: left;
@@ -14,16 +15,16 @@
 .version_link {
   text-decoration: none;
   font-size: 10pt;
-  color: #aaa;
+  color: ghostWhite;
 }
 .version_link:hover { 
-  color: #22a;
+  color: #004477;
   font-weight: bolder;
   font-style: italic;
 }
 
 #main {
-  background: #ffe;
+  background: ghostWhite;
   font-family: Arial;
   font-size: 12pt;
 }
@@ -32,7 +33,7 @@ h2#ruby_title {
   margin:5px 0 5px 0;
 }
 a#top_title_link:link, a#top_title_link:visited { 
-  color:#922;
+  color:#822;
 }
 a#top_title_link:hover { 
   color: #22a; 
@@ -41,20 +42,20 @@ a#top_title_link:hover {
 }
 div.top_list { padding:10px 10px 0 15px; }
 .class_title_bar { 
-  color:#ffe; 
+  color:#004477; 
   font-size: 16pt;
-  background:#922; 
-  padding-left:10px; 
+  background:#222222; 
+  padding: 4px 0 4px 10px; 
   margin:7px 0 5px 0; 
 }
 #class_name {
   font-size: 22pt;
-  color: #22a;
+  color: #0099cc;
 }
-h3.meth_type, h3.top_subtitle { color:#922; }
+h3.meth_type, h3.top_subtitle { color:#822; }
 div.meths { padding:0 10px 0 15px; }
 span.superclass {
-  color:#030; 
+  color: #004477; 
   margin-left:5px; 
 }
 span.superclass a {
@@ -68,15 +69,19 @@ span#top_link {
   padding-top:10px;
   margin:0px 20px;
 }
-span.counter { color:#22a; }
-a.top_class_link:link, a.top_class_link:visited { color: #22a; }
-a.class19_link:link, a.class19_link:visited { color:#030; }
+span#top_link a {
+  color: #444444;
+  text-decoration: none;
+}
+span.counter { color:#004477; }
+a.top_class_link:link, a.top_class_link:visited { color: #004477; }
+a.class19_link:link, a.class19_link:visited { color:#448800; }
 a.class_link, a#top_title_link, a.top_class_link, a.meth_link, a.meth19_link, a.class19_link { text-decoration:none; }
-a.class_link:link, a.class_link:visited { color:#ffe; }
-a.meth_link:link, a.meth_link:visited { color:#22a; }
-a.meth19_link:link, a.meth19_link:visited { color:#030; }
+a.class_link:link, a.class_link:visited { color:#448800; }
+a.meth_link:link, a.meth_link:visited { color:#004477; }
+a.meth19_link:link, a.meth19_link:visited { color:#448800; }
 a.class_link:hover, a.top_class_link:hover, a.class19_link:hover, a.meth_link:hover, a.meth19_link:hover {
-  color:#22a;
+  color:#005580;
   font-weight:bolder;
   font-style:italic;
 }
