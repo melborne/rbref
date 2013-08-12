@@ -2,7 +2,7 @@ require "rubygems"
 require "sinatra"
 
 configure do
-  VERSIONS = Dir['views/1*'].map { |path| File.basename(path, '.*') }.sort
+  VERSIONS = Dir['views/1*', 'views/2*'].map { |path| File.basename(path, '.*') }.sort
   LATEST = VERSIONS.last
 end
 

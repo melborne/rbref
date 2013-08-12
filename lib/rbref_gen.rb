@@ -34,7 +34,7 @@ class RbrefGenerator
     end
   ENCODE_TBL = { "*" => "=2a", "+" => "=2b", "\\-" => "=2d", "." => "=2e", "/" => "=2f", ":" => "=3a", "<" => "=3c", "=" => "=3d", ">" => "=3e", "?" => "=3f", "\\[" => "=5b", "\\]" => "=5d", "\\^" => "=5e", "~" => "=7e", "|" => "=7c", "@" => "=40", "!" => "=21",  "%" => "=25", "&" => "=26"}
   
-  REQUIRED_HERE = [:ERB, :StringScanner, :Gem, :RbConfig, :RbUtils, :RbrefGenerator]
+  REQUIRED_HERE = [:ERB, :CGI, :StringScanner, :Gem, :RbConfig, :RbUtils, :RbrefGenerator]
   
   def self.method_added(name)
     @@methods_here ||= []
@@ -43,7 +43,7 @@ class RbrefGenerator
   
   def get_classes_and_error_classes
     klasses = RbUtils.classes.reject { |klass| REQUIRED_HERE.any? { |ex| klass.to_s.match /^#{ex}/ } }.sort_by { |klass| klass.to_s }
-    klasses, errors = klasses.partition { |klass| klass.to_s !~ /Error/}
+    klasses, errors = klasses.partition { |klass| klass.to_s !~ /Error|Exception|Interrupt|fatal/}
     root = self.class.ancestors.select { |anc| anc.class == Class }.last
     klasses = klasses.class_tree([root])
     errors = errors.class_tree([Exception])
@@ -59,11 +59,11 @@ class RbrefGenerator
   end
   
   def get_libraries
-    RbUtils.standard_library
+    RbUtils.standard_libraries
   end
   
-  def get_ruby186_methods
-    RbUtils.ruby186_methods
+  def pre_ruby_methods
+    RbUtils.methods_in_previous_ruby
   end
   
   def generate(path="../views/#{RUBY_VERSION.delete('.')}.erb")
@@ -71,6 +71,7 @@ class RbrefGenerator
       f.puts ERB.new(DATA.read).result
     end
   end
+  
   def method_list(klass)
     methods = klass.methods_by_type
     methods.keys.each do |key|
@@ -83,7 +84,7 @@ class RbrefGenerator
   
   def class_link(klass)
     begin
-      unless RUBY186_METHODS.keys.to_s.include?(klass.to_s)
+      unless PRE_RUBY_METHODS.keys.to_s.include?(klass.to_s)
         'class19_link'
       else
         'top_class_link'
@@ -95,7 +96,7 @@ class RbrefGenerator
   
   def method_link(klass, meth_type, meth)
     begin
-      unless RUBY186_METHODS[klass.to_s][meth_type].include?(meth.to_s)
+      unless PRE_RUBY_METHODS[klass.to_s][meth_type].map(&:to_s).include?(meth.to_s)
         'meth19_link'
       else
         "meth_link"
@@ -153,9 +154,10 @@ rb = RbrefGenerator.new
 klasses, error_klasses = rb.get_classes_and_error_classes
 modules = rb.get_modules
 klass_and_module = klasses + modules + error_klasses
+error_klasses << 'fatal'
 constants = rb.get_constants
 libraries = rb.get_libraries
-RUBY186_METHODS = rb.get_ruby186_methods
+PRE_RUBY_METHODS = rb.pre_ruby_methods
 RUBY_REF = RbrefGenerator::RUBY_REF
 RUBY_DESC = RbrefGenerator::RUBY_DESC
 DIRECT_LINKS = RbrefGenerator::DIRECT_LINKS
@@ -186,7 +188,11 @@ __END__
  <div class='top_list'>
    <h3 class='top_subtitle'>Exception Class</h3>	    
    <% error_klasses.each do |error| %>
-   <span><a class=<%= rb.class_link(error) %> href="#<%= error %>"><%= error %></a> | </span>
+     <% if error != 'fatal' %>
+       <span><a class=<%= rb.class_link(error) %> href="#<%= error %>"><%= error %></a> | </span>
+     <% else %>
+       <span><a class=<%= rb.class_link(error) %> href="<%= RUBY_REF %>class/fatal.html"><%= error %></a> | </span>
+     <% end %>
    <% end %>
    <span class="counter"><%= error_klasses.length %></span>
  </div>
