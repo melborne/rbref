@@ -12,8 +12,7 @@ class Module
   
   def methods_by_type(mtypes=%w(public_methods protected_methods private_methods public_instance_methods protected_instance_methods private_instance_methods))
     mtypes.inject({}) do |h, mtype|
-      h[mtype] = self.send(mtype, false)
-                     .reject{ |m| $added_methods.include? m.to_s }
+      h[mtype] = self.send(mtype, false).reject{ |m| $added_methods.include? m.to_s }
       h
     end
   end
@@ -78,12 +77,13 @@ module RbUtils
         return [] unless system("#{ruby_path} -v")
 
         meths = %x(#{ruby_path} -rrbutils -e "#{<<CODE}")
-          meths = {}
+          h = {}
           objects = RbUtils.classes + RbUtils.modules - [RbUtils]
           objects.each do |klass|
-            meths[klass.to_s] = klass.methods_by_type
+            h[klass.to_s] = klass.methods_by_type
           end
-          p meths
+          h['ARGF.class'] = ARGF.class.methods_by_type # handle irregular case.
+          p h
 CODE
         eval(meths)
       rescue => e
