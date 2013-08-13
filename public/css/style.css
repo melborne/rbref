@@ -6,15 +6,35 @@
 #header {
    background: #222222;
    height: 25px;
-   padding: 7px 50px 3px;
+   padding: 7px 0 0 20px;
 }
+
+#logo {
+  float: left;
+  height: 24px;
+}
+
+#logo_link {
+  color: #822;
+  text-decoration: none;
+  font-size: 110%;
+}
+
+#versions {
+  float: left;
+  height: 24px;
+  margin-left: 30px;
+}
+
 .version {
   float: left;
-  width: 100px;
+  width: 70px;
+  padding-top: 3px;
 }
+
 .version_link {
   text-decoration: none;
-  font-size: 10pt;
+  font-size: 12pt;
   color: ghostWhite;
 }
 .version_link:hover { 

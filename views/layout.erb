@@ -21,11 +21,14 @@
   </head>
   <body>
     <div id='header'>
-      <% VERSIONS.each do |version| %>
-        <div class='version'>
-          <a class='version_link' href= "/<%= version %>"><%= version %></a>
-        </div>
-      <% end %>
+      <div id='logo'><a id='logo_link' href='/'>Rbref</a></div>
+      <div id='versions'>
+        <% VERSIONS.each do |version| %>
+          <div class='version'>
+            <a class='version_link' href= "/<%= version %>"><%= version %></a>
+          </div>
+        <% end %>
+      </div>
     </div>
     <div id='main'>
       <%= yield %> 
