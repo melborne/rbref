@@ -38,15 +38,15 @@ module RbUtils
 
   class << self
     def classes
-      objects(Class)
+      arr = []
+      ObjectSpace.each_object(Class){ |obj| arr << obj }
+      arr
     end
 
     def modules
-      objects(Module)
-    end
-
-    def objects(target)
-      ObjectSpace.each_object(Module).select { |obj| obj.class == target }
+      arr = []
+      ObjectSpace.each_object(Module){ |obj| arr << obj }
+      arr - classes
     end
 
     def all_constants
@@ -78,11 +78,12 @@ module RbUtils
 
         meths = %x(#{ruby_path} -rrbutils -e "#{<<CODE}")
           h = {}
-          objects = RbUtils.classes + RbUtils.modules - [RbUtils]
+          objects = []
+          ObjectSpace.each_object(Module) { |obj| objects << obj }
+          objects -= [RbUtils]
           objects.each do |klass|
             h[klass.to_s] = klass.methods_by_type
           end
-          h['ARGF.class'] = ARGF.class.methods_by_type # handle irregular case.
           p h
 CODE
         eval(meths)

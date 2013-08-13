@@ -34,7 +34,7 @@ class RbrefGenerator
     end
   ENCODE_TBL = { "*" => "=2a", "+" => "=2b", "\\-" => "=2d", "." => "=2e", "/" => "=2f", ":" => "=3a", "<" => "=3c", "=" => "=3d", ">" => "=3e", "?" => "=3f", "\\[" => "=5b", "\\]" => "=5d", "\\^" => "=5e", "~" => "=7e", "|" => "=7c", "@" => "=40", "!" => "=21",  "%" => "=25", "&" => "=26"}
   
-  REQUIRED_HERE = [:ERB, :CGI, :StringScanner, :Gem, :RbConfig, :RbUtils, :RbrefGenerator]
+  REQUIRED_HERE = [:ERB, :CGI, :Date, :StringScanner, :Gem, :RbConfig, :RbUtils, :RbrefGenerator]
   
   def self.method_added(name)
     @@methods_here ||= []
@@ -83,8 +83,9 @@ class RbrefGenerator
   end
   
   def class_link(klass)
+    # p PRE_RUBY_METHODS.keys.sort if klass.to_s.match /Encoding::Conv/
     begin
-      unless PRE_RUBY_METHODS.keys.to_s.include?(klass.to_s)
+      unless PRE_RUBY_METHODS.keys.map(&:to_s).include?(klass.to_s)
         'class19_link'
       else
         'top_class_link'
@@ -154,7 +155,7 @@ rb = RbrefGenerator.new
 klasses, error_klasses = rb.get_classes_and_error_classes
 modules = rb.get_modules
 klass_and_module = klasses + modules + error_klasses
-error_klasses << 'fatal'
+error_klasses << 'fatal' unless error_klasses.any? { |err| err.to_s == 'fatal' }
 constants = rb.get_constants
 libraries = rb.get_libraries
 PRE_RUBY_METHODS = rb.pre_ruby_methods
