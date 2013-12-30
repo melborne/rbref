@@ -35,6 +35,7 @@ module RbUtils
   LIB192 = LIB191 + ['objspace']
   LIB193 = LIB192 + ['io/console']
   LIB200 = LIB193 - ['kconv', 'syck']
+  LIB210 = LIB200 - ['curses']
 
   class << self
     def classes
@@ -62,6 +63,9 @@ module RbUtils
       when '1.9.2' then LIB192
       when '1.9.3' then LIB193
       when '2.0.0' then LIB200
+      when '2.1.0' then LIB210
+      else
+        abort "Not found Starndard Library Info"
       end.sort
     end
 
